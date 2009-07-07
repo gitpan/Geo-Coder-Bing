@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Geo-Coder-Bing
-version:            0.01
+version:            0.02
 abstract:           Geocode addresses with the Bing Maps API
 author:
     - gray <gray@cpan.org>
@@ -11,8 +11,10 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    JSON:        0
-    Test::More:  0
+    JSON:            2
+    LWP::UserAgent:  0
+    Test::More:      0
+    URI:             0
 resources:
     repository:  http://github.com/gray/geo-coder-bing
 no_index:
@@ -23,3 +25,5 @@ generated_by:       ExtUtils::MakeMaker version 6.52
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4
+recommends:
+    JSON::XS:  2

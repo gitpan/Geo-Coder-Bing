@@ -4,11 +4,11 @@ use strict;
 use warnings;
 
 use Carp qw(croak);
-use HTTP::Request;
 use JSON;
 use LWP::UserAgent;
+use URI;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
     my ($class, %params) = @_;
@@ -176,6 +176,8 @@ Each location result is a hashref; a typical example looks like:
 Accessor for the UserAgent object.
 
 =head1 SEE ALSO
+
+L<http://www.microsoft.com/maps/isdk/ajax/>
 
 L<Geo::Coder::Google>, L<Geo::Coder::Yahoo>
 
