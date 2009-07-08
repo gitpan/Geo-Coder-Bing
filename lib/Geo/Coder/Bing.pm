@@ -8,17 +8,21 @@ use JSON;
 use LWP::UserAgent;
 use URI;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
     my ($class, %params) = @_;
 
-    my $ua = delete $params{ua};
-    unless (ref $ua and $ua->isa(q(LWP::UserAgent))) {
-        $ua = LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION"),
+    my $self = bless {}, $class;
+
+    if ($params{ua}) {
+        $self->ua($params{ua});
+    }
+    else {
+        $self->{ua} = LWP::UserAgent->new(agent => "$class/$VERSION");
     }
 
-    return bless { ua => $ua };
+    return $self;
 }
 
 sub ua {
@@ -168,6 +172,9 @@ Each location result is a hashref; a typical example looks like:
         'Name' => 'Hollywood Blvd & N Highland Ave, Los Angeles, CA 90028'
     }
 
+If the location contains non-ASCII characters, ensure it is a Unicode-
+flagged string or consists of UTF-8 bytes.
+
 =head2 ua
 
     $ua = $geocoder->ua()
@@ -224,8 +231,8 @@ L<http://search.cpan.org/dist/Geo-Coder-Bing>
 
 Copyright (C) 2009 gray <gray at cpan.org>, all rights reserved.
 
-This library is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 AUTHOR
 

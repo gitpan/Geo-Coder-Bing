@@ -1,7 +1,7 @@
 Geo-Coder-Bing
 ==============
 
-This module provides an interface to Bing Geocoding Ajax API
+This module provides an interface to the Bing Maps Geocoding Ajax API
 
 INSTALLATION
 
@@ -19,6 +19,7 @@ This module requires these other modules and libraries:
     JSON
     LWP::UserAgent
     Test::More
+    URI
 
 COPYRIGHT AND LICENCE
 
