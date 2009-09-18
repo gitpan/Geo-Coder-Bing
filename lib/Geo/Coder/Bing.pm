@@ -8,7 +8,8 @@ use JSON;
 use LWP::UserAgent;
 use URI;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+$VERSION = eval $VERSION;
 
 sub new {
     my ($class, %params) = @_;
@@ -65,6 +66,7 @@ sub geocode {
     return unless $location;
 
     my $uri = ($URI ||= _construct_uri)->clone;
+    # Note: the quotes around the location parameter are required.
     $uri->query_form(query => qq("$location"), $uri->query_form);
 
     my $res = $self->ua->get($uri);
@@ -191,7 +193,7 @@ L<Geo::Coder::Google>, L<Geo::Coder::Yahoo>
 =head1 REQUESTS AND BUGS
 
 Please report any bugs or feature requests to
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-Bing>. I will be
+L<http://rt.cpan.org/Public/Bug/Report.html?Queue=Geo-Coder-Bing>. I will be
 notified, and then you'll automatically be notified of progress on your bug
 as I make changes.
 
@@ -219,7 +221,7 @@ L<http://cpanratings.perl.org/d/Geo-Coder-Bing>
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-Bing>
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Bing>
 
 =item * Search CPAN
 
