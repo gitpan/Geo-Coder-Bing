@@ -9,7 +9,7 @@ use JSON;
 use LWP::UserAgent;
 use URI;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 sub new {
@@ -22,6 +22,12 @@ sub new {
     }
     else {
         $self->{ua} = LWP::UserAgent->new(agent => "$class/$VERSION");
+    }
+
+    if ($params{debug}) {
+        my $dump_sub = sub { shift->dump(maxlength => 0); return };
+        $self->ua->add_handler(request_send  => $dump_sub);
+        $self->ua->add_handler(response_done => $dump_sub);
     }
 
     return $self;
@@ -63,7 +69,7 @@ sub _construct_uri {
 sub geocode {
     my $self = shift;
 
-    my $location = @_ % 2 ? $_[0] : $_[0] eq 'location' ? $_[1] : '';
+    my $location = @_ % 2 ? $_[0] : 'location' eq $_[0] ? $_[1] : '';
     return unless $location;
 
     $location = Encode::encode('utf-8', $location);
@@ -75,10 +81,16 @@ sub geocode {
     my $res = $self->ua->get($uri);
     return unless $res->is_success;
 
-    my $data = eval { from_json($res->decoded_content) };
+    my $content = $res->decoded_content;
+    return unless $content;
+
+    # Workaround invalid data.
+    $content =~ s[ \}\.d $ ][}]x;
+
+    my $data = eval { from_json($content) };
     return unless $data;
 
-    my @results = @{ $data->{Results} || [] };
+    my @results = @{ $data->{d}{Results} || [] };
     return wantarray ? @results : $results[0];
 }
 
@@ -188,7 +200,8 @@ Accessor for the UserAgent object.
 
 L<http://www.microsoft.com/maps/isdk/ajax/>
 
-L<Geo::Coder::Google>, L<Geo::Coder::Yahoo>
+L<Geo::Coder::Google>, L<Geo::Coder::Mapquest>, L<Geo::Coder::Multimap>,
+L<Geo::Coder::Yahoo>
 
 =head1 REQUESTS AND BUGS
 
