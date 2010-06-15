@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Geo-Coder-Bing
-version:            0.07
+version:            0.08
 abstract:           Geocode addresses with the Bing Maps API
 author:
     - gray <gray@cpan.org>
@@ -14,7 +14,7 @@ requires:
     Encode:          0
     JSON:            2
     LWP::UserAgent:  0
-    Test::More:      0
+    Test::More:      0.82
     URI:             1.36
 resources:
     repository:  http://github.com/gray/geo-coder-bing
