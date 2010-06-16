@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Geo-Coder-Bing
-version:            0.08
+version:            0.09
 abstract:           Geocode addresses with the Bing Maps API
 author:
     - gray <gray@cpan.org>
@@ -27,4 +27,5 @@ meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4
 recommends:
-    JSON::XS:  2
+    Crypt::SSLeay:  0
+    JSON::XS:       2
