@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Encode;
 use Geo::Coder::Bing;
+use LWP::UserAgent;
 use Test::More;
 
 unless ($ENV{BING_MAPS_KEY}) {
@@ -16,8 +17,7 @@ unless ($debug) {
     diag "Set GEO_CODER_BING_DEBUG to see request/response data";
 }
 
-my $has_ssl = eval { require Crypt::SSLeay; 1 } or
-    eval { require IO::Socket::SSL; 1 };
+my $has_ssl = LWP::UserAgent->is_protocol_supported('https');
 
 diag "";
 diag "Testing the REST API geocoder";
@@ -41,21 +41,21 @@ my $geocoder = Geo::Coder::Bing->new(
     ok(@locations > 1, 'there are many Main Streets');
 }
 {
-    my $address = qq(Ch\xE2teau d Uss\xE9, 37420, FR);
+    my $address = qq(Albrecht-Th\xE4r-Stra\xDFe 6, 48147 M\xFCnster, Germany);
 
     my $location = $geocoder->geocode($address);
     ok($location, 'latin1 bytes');
-    is($location->{address}{countryRegion}, 'France', 'latin1 bytes');
+    is($location->{address}{countryRegion}, 'Germany', 'latin1 bytes');
 
     $location = $geocoder->geocode(decode('latin1', $address));
     ok($location, 'UTF-8 characters');
-    is($location->{address}{countryRegion}, 'France', 'UTF-8 characters');
+    is($location->{address}{countryRegion}, 'Germany', 'UTF-8 characters');
 
     $location = $geocoder->geocode(
         encode('utf-8', decode('latin1', $address))
     );
     ok($location, 'UTF-8 bytes');
-    is($location->{address}{countryRegion}, 'France', 'UTF-8 bytes');
+    is($location->{address}{countryRegion}, 'Germany', 'UTF-8 bytes');
 }
 {
     my $address = decode('latin1', qq(Schm\xF6ckwitz, Berlin, Germany));
@@ -73,6 +73,7 @@ SKIP: {
 
     $geocoder = Geo::Coder::Bing->new(
         key   => $ENV{BING_MAPS_KEY},
+        https => 1,
         debug => $debug
     );
     my $address  = 'Hollywood & Highland, Los Angeles, CA';
@@ -84,9 +85,9 @@ diag "";
 diag "Testing the AJAX API geocoder";
 print "*" x 75, "\n";
 
-$geocoder = eval {
+$geocoder = do {
     # Silence the missing key warning.
-    local $SIG{'__WARN__'} = sub { };
+    local $SIG{__WARN__} = sub { };
 
     Geo::Coder::Bing->new(debug => $debug);
 };
@@ -104,21 +105,21 @@ $geocoder = eval {
     ok(@locations > 1, 'there are many Main Streets');
 }
 {
-    my $address = qq(Ch\xE2teau d Uss\xE9, 37420, FR);
+    my $address = qq(Albrecht-Th\xE4r-Stra\xDFe 6, 48147 M\xFCnster, Germany);
 
     my $location = $geocoder->geocode($address);
     ok($location, 'latin1 bytes');
-    is($location->{Address}{CountryRegion}, 'France', 'latin1 bytes');
+    is($location->{Address}{CountryRegion}, 'Germany', 'latin1 bytes');
 
     $location = $geocoder->geocode(decode('latin1', $address));
     ok($location, 'UTF-8 characters');
-    is($location->{Address}{CountryRegion}, 'France', 'UTF-8 characters');
+    is($location->{Address}{CountryRegion}, 'Germany', 'UTF-8 characters');
 
     $location = $geocoder->geocode(
         encode('utf-8', decode('latin1', $address))
     );
     ok($location, 'UTF-8 bytes');
-    is($location->{Address}{CountryRegion}, 'France', 'UTF-8 bytes');
+    is($location->{Address}{CountryRegion}, 'Germany', 'UTF-8 bytes');
 }
 {
     my $address = decode('latin1', qq(Schm\xF6ckwitz, Berlin, Germany));
@@ -134,7 +135,7 @@ $geocoder = eval {
 SKIP: {
     skip 'no SSL support', 1 unless $has_ssl;
 
-    $geocoder = eval {
+    $geocoder = do {
         # Silence the missing key warning.
         local $SIG{'__WARN__'} = sub { };
 
