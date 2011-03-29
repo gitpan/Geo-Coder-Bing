@@ -9,7 +9,7 @@ use JSON;
 use LWP::UserAgent;
 use URI;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 $VERSION = eval $VERSION;
 
 sub new {
@@ -21,26 +21,21 @@ sub new {
 
     my $self = bless \ %params, $class;
 
-    if ($params{ua}) {
-        $self->ua($params{ua});
-    }
-    else {
-        $self->{ua} = LWP::UserAgent->new(agent => "$class/$VERSION");
-    }
+    $self->ua(
+        $params{ua} || LWP::UserAgent->new(agent => "$class/$VERSION")
+    );
 
     if ($self->{debug}) {
         my $dump_sub = sub { $_[0]->dump(maxlength => 0); return };
         $self->ua->set_my_handler(request_send  => $dump_sub);
         $self->ua->set_my_handler(response_done => $dump_sub);
     }
-
-    $self->{compress} = 1 unless exists $self->{compress};
-    $self->ua->default_header(accept_encoding => 'gzip,deflate')
-        if $self->{compress};
-
-    if ($self->{https} and not $self->ua->is_protocol_supported('https')) {
-        croak q('https' requires Crypt::SSLeay or IO::Socket::SSL)
+    elsif (exists $self->{compress} ? $self->{compress} : 1) {
+        $self->ua->default_header(accept_encoding => 'gzip,deflate');
     }
+
+    croak q('https' requires LWP::Protocol::https)
+        if $self->{https} and not $self->ua->is_protocol_supported('https');
 
     return $self;
 }
@@ -170,7 +165,8 @@ geocoding service.
     $geocoder = Geo::Coder::Bing->new('Your Bing Maps key')
     $geocoder = Geo::Coder::Bing->new(
         key   => 'Your Bing Maps key',
-        https => 1,
+        # https => 1,
+        # debug => 1,
     )
 
 Creates a new geocoding object.
@@ -189,7 +185,7 @@ object.
     @locations = $geocoder->geocode(location => $location)
 
 In scalar context, this method returns the first location result; and in
-list context it returns all locations results.
+list context it returns all location results.
 
 Each location result is a hashref; a typical example looks like:
 
@@ -244,8 +240,7 @@ returned from both APIs differs slightly.
 
 L<http://msdn.microsoft.com/en-us/library/ff701713.aspx>
 
-L<Geo::Coder::Bing::Bulk>, L<Geo::Coder::Google>, L<Geo::Coder::Mapquest>,
-L<Geo::Coder::Multimap>, L<Geo::Coder::Yahoo>
+L<Geo::Coder::Bing::Bulk>
 
 =head1 REQUESTS AND BUGS
 
@@ -282,13 +277,13 @@ L<http://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Bing>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Geo-Coder-Bing>
+L<http://search.cpan.org/dist/Geo-Coder-Bing/>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2010 gray <gray at cpan.org>, all rights reserved.
+Copyright (C) 2009-2011 gray <gray at cpan.org>, all rights reserved.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
