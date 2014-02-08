@@ -8,9 +8,6 @@ use Test::More;
 unless ($ENV{BING_MAPS_KEY}) {
     plan skip_all => 'BING_MAPS_KEY environment variable must be set';
 }
-else {
-    plan tests => 20;
-}
 
 my $debug = $ENV{GEO_CODER_BING_DEBUG};
 unless ($debug) {
@@ -35,6 +32,10 @@ my $geocoder = Geo::Coder::Bing->new(
         qr/^98052\b/,
         "correct zip code for $address"
     );
+
+    $location = $geocoder->geocode($address, incl => 'ciso2,queryParse');
+    is($location->{address}{countryRegionIso2}, 'US', 'countryRegionIso2 param');
+    ok($location->{queryParseValues}, 'queryParseValues param');
 }
 {
     my @locations = $geocoder->geocode('Main Street');
@@ -148,3 +149,5 @@ SKIP: {
     my $location = $geocoder->geocode($address);
     like($location->{Address}{PostalCode}, qr/^98052\b/, 'https');
 }
+
+done_testing;
